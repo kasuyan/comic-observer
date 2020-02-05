@@ -1,20 +1,30 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <Button @click="onToggleEdit">button</Button>
+    <Top />
+    <Detail :isShow="isEdit" :onToggleEdit="onToggleEdit" />
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import HelloWorld from "./components/HelloWorld.vue";
+import Top from "./components/pages/top.vue";
+import Detail from "./components/pages/detail.vue";
+import Button from "./components/atoms/Button.vue";
 
 @Component({
   components: {
-    HelloWorld
+    Top,
+    Detail
   }
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  isEdit: boolean = false;
+
+  onToggleEdit() {
+    this.isEdit = !this.isEdit;
+  }
+}
 </script>
 
 <style>
@@ -24,6 +34,7 @@ export default class App extends Vue {}
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  position: relative;
+  overflow: hidden;
 }
 </style>
