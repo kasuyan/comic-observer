@@ -47,6 +47,7 @@ export default class DetailPage extends Vue {
   @Prop() private isShow!: boolean;
   @Prop() onDeleteBook!: (idx: number) => void;
   @Prop() onClickEditHide!: () => void;
+  @Prop() saveBookDta!: () => void;
 
   title: string = "hoge";
   isbn: number = 0;
@@ -54,6 +55,7 @@ export default class DetailPage extends Vue {
   READER: any = null;
   errorId: number = 0;
   isScaning: boolean = false;
+  isLoading: boolean = false;
 
   created() {
     eventHub.$on("stopScan", this.onStopScan);
@@ -62,6 +64,7 @@ export default class DetailPage extends Vue {
   onStopScan() {
     if (this.READER) {
       this.READER.reset();
+      this.saveBookDta();
       this.isScaning = false;
     }
   }
@@ -76,11 +79,11 @@ export default class DetailPage extends Vue {
 
   onScan() {
     this.READER = new BrowserMultiFormatReader();
+    this.isScaning = true;
     this.READER.getVideoInputDevices().then((videoInputDevices: any) => {
       const target =
         videoInputDevices.length === 1 ? 0 : videoInputDevices.length - 1;
       const selectedDeviceId = videoInputDevices[target].deviceId;
-      this.isScaning = true;
       this.READER.decodeFromVideoDevice(
         selectedDeviceId,
         "video",
@@ -97,6 +100,10 @@ export default class DetailPage extends Vue {
   }
 
   getBookInfo(isbn: number) {
+    if (this.isLoading) {
+      return;
+    }
+    this.isLoading = true;
     axios
       .get(`https://www.googleapis.com/books/v1/volumes?q=${isbn}`)
       .then(res => {
@@ -111,17 +118,27 @@ export default class DetailPage extends Vue {
       })
       .then(res => {
         const bookInfo = res[0];
+
         this.currentData.name = bookInfo.volumeInfo.title;
-        this.currentData.isbn = bookInfo.volumeInfo.industryIdentifiers.filter(
-          (ids: any) => {
-            return Number(ids.identifier) === isbn;
+        const matchedId = bookInfo.volumeInfo.industryIdentifiers.filter(
+          (id: any) => {
+            return Number(id.identifier) === isbn;
           }
-        )[0].identifier;
-        this.currentData.image = bookInfo.volumeInfo.imageLinks.thumbnail;
+        );
+        this.currentData.isbn = Number(matchedId[0].identifier);
+
+        this.currentData.description =
+          bookInfo.volumeInfo.description || "No description.";
+        if (bookInfo.volumeInfo.imageLinks) {
+          this.currentData.image = bookInfo.volumeInfo.imageLinks.thumbnail;
+        }
         this.onStopScan();
       })
       .catch(err => {
         this.errorId = isbn;
+      })
+      .finally(() => {
+        this.isLoading = false;
       });
   }
 }

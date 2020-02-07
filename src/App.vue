@@ -10,6 +10,7 @@
       :currentData="currentData"
       :onDeleteBook="onDeleteBook"
       :onClickEditHide="onClickEditHide"
+      :saveBookDta="saveBookDta"
     />
     <Menu
       :onAddDataAndOpen="onAddDataAndOpen"
@@ -55,6 +56,7 @@ export default class App extends Vue {
   bookData: BookData[] = [];
 
   created() {
+    // GET LOCAL DATA
     localforage.getItem("CDDB").then((res: any): void => {
       if (res && res.length) {
         this.bookData = res;
