@@ -40,7 +40,7 @@ import IconSync from "../atoms/IconSync.vue";
 export default class Menu extends Vue {
   @Prop() onClickEditShow!: () => void;
   @Prop() onClickEditHide!: () => void;
-  @Prop() onAddData!: () => void;
+  @Prop() onAddDataAndOpen!: () => void;
   @Prop() isEdit!: boolean;
 
   isOpen: boolean = false;
@@ -62,7 +62,7 @@ export default class Menu extends Vue {
   }
 
   onClickEditOpen() {
-    this.onAddData();
+    this.onAddDataAndOpen();
     this.onClickMenuClose();
     this.onClickEditShow();
   }

@@ -3,7 +3,7 @@
     <ul>
       <BookListItem
         v-for="(item, index) in bookData"
-        :key="item.name"
+        :key="item.isbn"
         :data="item"
         :index="index"
         :onSelectData="onSelectData"

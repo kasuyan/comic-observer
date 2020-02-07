@@ -33,9 +33,13 @@ li {
   list-style: none;
   margin: 0 0 0.4rem 0;
   border-bottom: 1px solid #ccc;
-  padding: 0.4rem;
+  padding: 0 0.4rem 0.4rem;
   display: flex;
   align-items: center;
+}
+
+li:first-child {
+  padding-top: 0.4rem;
 }
 
 h2 {

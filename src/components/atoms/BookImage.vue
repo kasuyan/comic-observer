@@ -1,8 +1,10 @@
 <template>
-  <div :style="{
+  <div
+    :style="{
       width: width + 'px',
       height: height + 'px'
-    }">
+    }"
+  >
     <img v-if="src" :src="src" :alt="alt" />
     <div v-else class="no-image">NO IMAGE</div>
   </div>

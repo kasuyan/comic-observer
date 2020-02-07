@@ -10,9 +10,7 @@
       />
       <dl class="info">
         <dt>あらすじ</dt>
-        <dd>
-          {{ currentData.description }}
-        </dd>
+        <dd>{{ currentData.description }}</dd>
         <dt>ISBN</dt>
         <dd>{{ currentData.isbn }}</dd>
       </dl>
@@ -48,7 +46,7 @@ export default class DetailPage extends Vue {
   title: string = "hoge";
   isbn: number = 0;
   image: string = "";
-  READER: any = {}
+  READER: any = {};
   errorId: number = 0;
 
   onDelete() {
@@ -61,10 +59,11 @@ export default class DetailPage extends Vue {
   onScan() {
     this.READER = new BrowserMultiFormatReader();
     this.READER.getVideoInputDevices().then((videoInputDevices: any) => {
-      const target = videoInputDevices.length === 1 ? 0 : videoInputDevices.length - 1;
-      console.log(videoInputDevices, target)
+      const target =
+        videoInputDevices.length === 1 ? 0 : videoInputDevices.length - 1;
+      console.log(videoInputDevices, target);
       const selectedDeviceId = videoInputDevices[target].deviceId;
-      console.log(selectedDeviceId)
+      console.log(selectedDeviceId);
       this.READER.decodeFromVideoDevice(
         selectedDeviceId,
         "video",
