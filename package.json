@@ -5,7 +5,9 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "build:prd": "vue-cli-service build --mode production",
+    "lint": "vue-cli-service lint",
+    "deploy": "yarn build:prd && gh-pages -d dist"
   },
   "dependencies": {
     "@zxing/library": "^0.15.2",
@@ -26,6 +28,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-vue": "^5.0.0",
+    "gh-pages": "^2.2.0",
     "prettier": "^1.19.1",
     "typescript": "~3.5.3",
     "vue-template-compiler": "^2.6.10"
