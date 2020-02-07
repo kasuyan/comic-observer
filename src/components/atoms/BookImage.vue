@@ -2,7 +2,8 @@
   <div
     :style="{
       width: width + 'px',
-      height: height + 'px'
+      height: height + 'px',
+      maxHeight: height + 'px'
     }"
   >
     <img v-if="src" :src="src" :alt="alt" />
