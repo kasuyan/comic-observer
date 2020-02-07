@@ -62,6 +62,7 @@ export default class DetailPage extends Vue {
   }
 
   onStopScan() {
+    console.log("onStopScan");
     if (this.READER) {
       this.READER.reset();
       this.saveBookDta();
@@ -105,34 +106,18 @@ export default class DetailPage extends Vue {
     }
     this.isLoading = true;
     axios
-      .get(`https://www.googleapis.com/books/v1/volumes?q=${isbn}`)
+      .get(`https://api.openbd.jp/v1/get?isbn=${isbn}`)
       .then(res => {
-        return res.data.items.filter((item: any) => {
-          let flag = false;
-          item.volumeInfo.industryIdentifiers.filter(
-            (ids: any) => (flag = Number(ids.identifier) === isbn)
-          );
-
-          return flag;
-        });
-      })
-      .then(res => {
-        const bookInfo = res[0];
-
-        this.currentData.name = bookInfo.volumeInfo.title;
-        const matchedId = bookInfo.volumeInfo.industryIdentifiers.filter(
-          (id: any) => {
-            return Number(id.identifier) === isbn;
-          }
-        );
-        this.currentData.isbn = Number(matchedId[0].identifier);
-
-        this.currentData.description =
-          bookInfo.volumeInfo.description || "No description.";
-        if (bookInfo.volumeInfo.imageLinks) {
-          this.currentData.image = bookInfo.volumeInfo.imageLinks.thumbnail;
+        if (res.data[0]) {
+          console.log(res.data, res.data.length);
+          console.log(res.data[0]);
+          const bookInfo = res.data[0];
+          this.currentData.name = bookInfo.summary.title;
+          this.currentData.isbn = bookInfo.summary.isbn;
+          this.currentData.description =
+            bookInfo.onix.CollateralDetail.TextContent[0].Text;
+          this.onStopScan();
         }
-        this.onStopScan();
       })
       .catch(err => {
         this.errorId = isbn;
