@@ -15,10 +15,14 @@
         <dd>{{ currentData.isbn }}</dd>
       </dl>
     </div>
-    <Button @onClick="onScan">マンガの登録 / 上書き</Button>
+    <Button @onClick="onScan">マンガの登録</Button>
     <Button :isDelete="true" @onClick="onDelete">マンガの削除</Button>
     <!-- <div class="newbook">新刊情報</div> -->
-    <video id="video"></video>
+    <div class="scan-view" v-show="isScaning">
+      <video id="video"></video>
+      <span class="red-line"></span>
+      <p>バーコードは978<b>4</b>で始まるものを読み取ってください</p>
+    </div>
   </div>
 </template>
 
@@ -26,6 +30,7 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import axios from "axios";
 import { BrowserMultiFormatReader } from "@zxing/library";
+import { eventHub } from "../../App.vue";
 
 import Button from "../atoms/Button.vue";
 import { BookData } from "../organisms/BookList.vue";
@@ -46,13 +51,26 @@ export default class DetailPage extends Vue {
   title: string = "hoge";
   isbn: number = 0;
   image: string = "";
-  READER: any = {};
+  READER: any = null;
   errorId: number = 0;
+  isScaning: boolean = false;
+
+  created() {
+    eventHub.$on("stopScan", this.onStopScan);
+  }
+
+  onStopScan() {
+    if (this.READER) {
+      this.READER.reset();
+      this.isScaning = false;
+    }
+  }
 
   onDelete() {
     if (window.confirm("delete this comic ?")) {
       this.onDeleteBook(this.currentData.isbn);
       this.onClickEditHide();
+      this.onStopScan();
     }
   }
 
@@ -61,9 +79,8 @@ export default class DetailPage extends Vue {
     this.READER.getVideoInputDevices().then((videoInputDevices: any) => {
       const target =
         videoInputDevices.length === 1 ? 0 : videoInputDevices.length - 1;
-      console.log(videoInputDevices, target);
       const selectedDeviceId = videoInputDevices[target].deviceId;
-      console.log(selectedDeviceId);
+      this.isScaning = true;
       this.READER.decodeFromVideoDevice(
         selectedDeviceId,
         "video",
@@ -101,7 +118,7 @@ export default class DetailPage extends Vue {
           }
         )[0].identifier;
         this.currentData.image = bookInfo.volumeInfo.imageLinks.thumbnail;
-        this.READER.reset();
+        this.onStopScan();
       })
       .catch(err => {
         this.errorId = isbn;
@@ -167,8 +184,40 @@ h2 {
   background-color: #eee;
 }
 
-video {
+.scan-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.95);
   width: 100%;
-  height: 180px;
+  height: 100%;
+}
+
+.red-line {
+  border: 2px solid rgb(225, 59, 59);
+  position: absolute;
+  top: 46vh;
+  left: 15vw;
+  width: 70vw;
+  height: 8vh;
+}
+
+.scan-view p {
+  position: absolute;
+  top: 2vh;
+  font-size: 0.6rem;
+  text-align: center;
+  width: 100%;
+}
+
+.scan-view p b {
+  color: rgb(225, 59, 59);
+}
+
+video {
+  margin: 10vh 10vw;
+  width: 80vw;
+  height: 80vh;
+  border: 1px solid #ccc;
 }
 </style>

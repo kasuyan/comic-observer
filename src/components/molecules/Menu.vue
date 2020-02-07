@@ -22,6 +22,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { eventHub } from "../../App.vue";
 import IconMenu from "../atoms/IconMenu.vue";
 import IconBack from "../atoms/IconBack.vue";
 import IconPlus from "../atoms/IconPlus.vue";
@@ -50,6 +51,7 @@ export default class Menu extends Vue {
     if (this.isEdit) {
       this.onClickMenuClose();
       this.onClickEditHide();
+      eventHub.$emit("stopScan");
     }
   }
 

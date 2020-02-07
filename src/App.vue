@@ -28,6 +28,12 @@ import Menu from "./components/molecules/Menu.vue";
 import { BookData } from "./components/organisms/BookList.vue";
 import localforage from "localforage";
 
+export interface eventHub extends HTMLDocument {
+  eventHub: Vue;
+}
+export declare const global: eventHub;
+export const eventHub = (global.eventHub = new Vue());
+
 localforage.config({
   driver: localforage.INDEXEDDB,
   name: "comicObserver",
@@ -47,33 +53,6 @@ export default class App extends Vue {
   isEdit: boolean = false;
   currentData: object = {};
   bookData: BookData[] = [];
-  // bookData: BookData[] = [
-  //   {
-  //     isbn: 12341341,
-  //     name: "鬼滅の刃 19 (ジャンプコミックスDIGITAL) Kindle版",
-  //     vol: 19,
-  //     description: "",
-  //     updata: true,
-  //     image: "https://images-fe.ssl-images-amazon.com/images/I/51ytIQmuA4L.jpg"
-  //   },
-  //   {
-  //     isbn: 12341342,
-  //     name: "ONE PIECE モノクロ版 95 (ジャンプコミックスDIGITAL) Kindle版",
-  //     vol: 95,
-  //     description: "",
-  //     updata: false,
-  //     image:
-  //       "https://images-fe.ssl-images-amazon.com/images/I/61o1ZBYiFxL._SY346_.jpg"
-  //   },
-  //   {
-  //     isbn: 0,
-  //     name: "未設定タイトル",
-  //     description: "",
-  //     vol: 0,
-  //     updata: false,
-  //     image: ""
-  //   }
-  // ];
 
   created() {
     localforage.getItem("CDDB").then((res: any): void => {
