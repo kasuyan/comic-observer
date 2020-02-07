@@ -1,7 +1,13 @@
 <template>
   <div>
-    <ul v-for="item in bookData" :key="item.name">
-      <BookListItem :data="item" />
+    <ul>
+      <BookListItem
+        v-for="(item, index) in bookData"
+        :key="item.name"
+        :data="item"
+        :index="index"
+        :onSelectData="onSelectData"
+      />
     </ul>
   </div>
 </template>
@@ -14,6 +20,7 @@ export interface BookData {
   isbn: number;
   name: string;
   vol: number;
+  description: string;
   image: string;
   updata: boolean;
 }
@@ -26,6 +33,7 @@ export interface BookData {
 export default class BookList extends Vue {
   @Prop({ default: "aho" }) private bookData!: BookData[];
   @Prop() private msg!: string;
+  @Prop() onSelectData!: (index: number) => void;
 }
 </script>
 
@@ -35,6 +43,7 @@ h1 {
 }
 
 ul {
+  margin: 0 0 6rem;
   padding: 0;
 }
 </style>

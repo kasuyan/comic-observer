@@ -1,11 +1,8 @@
 <template>
-  <div
-    :style="{
+  <div :style="{
       width: width + 'px',
-      'flex-basis': width + 'px',
       height: height + 'px'
-    }"
-  >
+    }">
     <img v-if="src" :src="src" :alt="alt" />
     <div v-else class="no-image">NO IMAGE</div>
   </div>
@@ -28,6 +25,7 @@ img,
 .no-image {
   width: 100%;
   height: auto;
+  box-sizing: border-box;
 }
 
 .no-image {

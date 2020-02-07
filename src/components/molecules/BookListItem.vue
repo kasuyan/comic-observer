@@ -1,5 +1,5 @@
 <template>
-  <li>
+  <li @click="onClick">
     <BookImage :src="data.image" :width="80" :height="108" :alt="data.name" />
     <!-- <img v-if="data.image" :src="data.image" alt />
     <div v-else class="no-image">NO IMAGE</div>-->
@@ -19,13 +19,21 @@ import BookImage from "../atoms/BookImage.vue";
 })
 export default class BookListItem extends Vue {
   @Prop() private data!: BookData;
+  @Prop() private index!: number;
+  @Prop() onSelectData!: (index: number) => void;
+
+  onClick() {
+    this.onSelectData(this.index);
+  }
 }
 </script>
 
 <style scoped>
 li {
   list-style: none;
-  margin: 0;
+  margin: 0 0 0.4rem 0;
+  border-bottom: 1px solid #ccc;
+  padding: 0.4rem;
   display: flex;
   align-items: center;
 }

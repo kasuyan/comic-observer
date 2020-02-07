@@ -1,29 +1,84 @@
 <template>
   <div class="detail-page" :class="{ 'is-show': isShow }">
-    <Button @onClick="onToggleEdit">back</Button>
-    <h2>{{ title }}</h2>
-    <img :src="image" />
-    <p>{{ isbn }}</p>
+    <h2>{{ currentData.name }}</h2>
+    <div class="col2">
+      <BookImage
+        :src="currentData.image"
+        :width="140"
+        :height="190"
+        :alt="currentData.name"
+      />
+      <dl class="info">
+        <dt>あらすじ</dt>
+        <dd>
+          {{ currentData.description }}
+        </dd>
+        <dt>ISBN</dt>
+        <dd>{{ currentData.isbn }}</dd>
+      </dl>
+    </div>
+    <Button @onClick="onScan">マンガの登録 / 上書き</Button>
+    <Button :isDelete="true" @onClick="onDelete">マンガの削除</Button>
+    <!-- <div class="newbook">新刊情報</div> -->
     <video id="video"></video>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import Button from "../atoms/Button.vue";
-import { BrowserMultiFormatReader } from "@zxing/library";
 import axios from "axios";
+import { BrowserMultiFormatReader } from "@zxing/library";
+
+import Button from "../atoms/Button.vue";
+import { BookData } from "../organisms/BookList.vue";
+import BookImage from "../atoms/BookImage.vue";
+
 @Component({
   components: {
-    Button
+    Button,
+    BookImage
   }
 })
 export default class DetailPage extends Vue {
+  @Prop() private currentData!: BookData;
   @Prop() private isShow!: boolean;
-  @Prop() private onToggleEdit!: () => {};
+  @Prop() onDeleteBook!: (idx: number) => void;
+  @Prop() onClickEditHide!: () => void;
+
   title: string = "hoge";
   isbn: number = 0;
   image: string = "";
+  READER: any = {}
+  errorId: number = 0;
+
+  onDelete() {
+    if (window.confirm("delete this comic ?")) {
+      this.onDeleteBook(this.currentData.isbn);
+      this.onClickEditHide();
+    }
+  }
+
+  onScan() {
+    this.READER = new BrowserMultiFormatReader();
+    this.READER.getVideoInputDevices().then((videoInputDevices: any) => {
+      const target = videoInputDevices.length === 1 ? 0 : videoInputDevices.length - 1;
+      console.log(videoInputDevices, target)
+      const selectedDeviceId = videoInputDevices[target].deviceId;
+      console.log(selectedDeviceId)
+      this.READER.decodeFromVideoDevice(
+        selectedDeviceId,
+        "video",
+        (result: any, err: any) => {
+          if (result && this.errorId !== Number(result.text)) {
+            this.getBookInfo(Number(result));
+          }
+          if (err) {
+            // console.error(err);
+          }
+        }
+      );
+    });
+  }
 
   getBookInfo(isbn: number) {
     axios
@@ -34,62 +89,87 @@ export default class DetailPage extends Vue {
           item.volumeInfo.industryIdentifiers.filter(
             (ids: any) => (flag = Number(ids.identifier) === isbn)
           );
+
           return flag;
         });
       })
       .then(res => {
         const bookInfo = res[0];
-        this.title = bookInfo.volumeInfo.title;
-        this.isbn = bookInfo.volumeInfo.industryIdentifiers.filter(
+        this.currentData.name = bookInfo.volumeInfo.title;
+        this.currentData.isbn = bookInfo.volumeInfo.industryIdentifiers.filter(
           (ids: any) => {
             return Number(ids.identifier) === isbn;
           }
         )[0].identifier;
-        this.image = bookInfo.volumeInfo.imageLinks.thumbnail;
+        this.currentData.image = bookInfo.volumeInfo.imageLinks.thumbnail;
+        this.READER.reset();
       })
       .catch(err => {
-        console.error("Not found this book");
+        this.errorId = isbn;
       });
-  }
-  mounted() {
-    const READER = new BrowserMultiFormatReader();
-    console.log(READER);
-    // const result: number = 9784902372199;
-    // this.getBookInfo(result);
-
-    // READER.getVideoInputDevices().then(videoInputDevices => {
-    //   console.log(videoInputDevices);
-    //   const selectedDeviceId = videoInputDevices[0].deviceId;
-    //   READER.decodeFromVideoDevice(selectedDeviceId, "video", (result, err) => {
-    //     if (result) {
-    //       console.log(result);
-    //       this.getBookInfo(Number(result));
-    //     }
-    //     if (err) {
-    //       // console.error(err);
-    //     }
-    //   });
-    // });
   }
 }
 </script>
 
 <style scoped>
-h2 {
-  color: green;
+.detail-page {
+  width: calc(100vw - 2rem);
+  height: calc(100vh - 2rem);
+  position: fixed;
+  bottom: -100vh;
+  background-color: #fff;
+  transition: bottom 200ms ease-out;
+  padding: 1rem;
 }
 
-.detail-page {
-  width: 100vw;
-  min-height: 100vh;
-  position: absolute;
-  top: 0;
-  background-color: #fff;
-  left: 100vw;
-  transition: left 200ms ease-out;
+h2 {
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+.col2 {
+  display: flex;
+}
+
+.col2 > div {
+  margin-right: 1rem;
+  flex-basis: 140px;
+}
+
+.col2 > dl {
+  flex: 1;
+  text-align: left;
+  margin: 0;
+}
+
+.col2 > dl dt {
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.col2 > dl dd {
+  font-size: 0.7rem;
+  margin: 0.5rem 0 1rem 1rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
 }
 
 .detail-page.is-show {
-  left: 0;
+  bottom: 0;
+  text-align: center;
+}
+
+.newbook {
+  margin: 2rem 0;
+  height: 5rem;
+  border: 1px solid #ccc;
+  background-color: #eee;
+}
+
+video {
+  width: 100%;
+  height: 180px;
 }
 </style>
