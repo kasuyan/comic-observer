@@ -1,18 +1,13 @@
 <template>
-  <div
-    :style="{
-      width: width + 'px',
-      height: height + 'px',
-      maxHeight: height + 'px'
-    }"
-  >
-    <img v-if="src" :src="src" :alt="alt" />
+  <div :style="{ width: width + 'px', height: height + 'px'}">
+    <img v-if="src" :src="src" :alt="alt" @error="resetSrc" />
     <div v-else class="no-image">NO IMAGE</div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import axios from "axios";
 
 @Component
 export default class BookImage extends Vue {
@@ -20,6 +15,10 @@ export default class BookImage extends Vue {
   @Prop() private width!: string;
   @Prop() private height!: string;
   @Prop() private alt!: string;
+
+  resetSrc() {
+    this.src = "";
+  }
 }
 </script>
 
@@ -27,8 +26,9 @@ export default class BookImage extends Vue {
 img,
 .no-image {
   width: 100%;
-  height: auto;
+  height: 100%;
   box-sizing: border-box;
+  vertical-align: bottom;
 }
 
 .no-image {

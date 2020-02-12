@@ -1,27 +1,29 @@
 <template>
   <div class="detail-page" :class="{ 'is-show': isShow }">
-    <h2>{{ currentData.name }}</h2>
+    <textarea class="title" v-model="currentData.name" />
     <div class="col2">
-      <BookImage
-        :src="currentData.image"
-        :width="140"
-        :height="190"
-        :alt="currentData.name"
-      />
+      <BookImage :src="currentData.image" :width="140" :height="190" :alt="currentData.name" />
       <dl class="info">
         <dt>あらすじ</dt>
         <dd>{{ currentData.description }}</dd>
         <dt>ISBN</dt>
-        <dd>{{ currentData.isbn }}</dd>
+        <dd>
+          <textarea class="isbn" v-model="currentData.isbn" />
+        </dd>
       </dl>
     </div>
-    <Button @onClick="onScan">マンガの登録</Button>
+    <Button @onClick="onBookSave">保存</Button>
+    <Button @onClick="onSync">入力データから登録</Button>
+    <Button @onClick="onScan">バーコードから登録</Button>
     <Button :isDelete="true" @onClick="onDelete">マンガの削除</Button>
     <!-- <div class="newbook">新刊情報</div> -->
     <div class="scan-view" v-show="isScaning">
       <video id="video"></video>
       <span class="red-line"></span>
-      <p>バーコードは978<b>4</b>で始まるものを読み取ってください</p>
+      <p>
+        バーコードは978
+        <b>4</b>で始まるものを読み取ってください
+      </p>
     </div>
   </div>
 </template>
@@ -61,13 +63,21 @@ export default class DetailPage extends Vue {
     eventHub.$on("stopScan", this.onStopScan);
   }
 
+  onBookSave() {
+    this.saveBookDta();
+  }
+
+  async onSync() {
+    await this.getBookInfo(this.currentData.isbn);
+    this.onBookSave();
+  }
+
   onStopScan() {
-    console.log("onStopScan");
     if (this.READER) {
       this.READER.reset();
-      this.saveBookDta();
-      this.isScaning = false;
     }
+    this.saveBookDta();
+    this.isScaning = false;
   }
 
   onDelete() {
@@ -93,14 +103,14 @@ export default class DetailPage extends Vue {
             this.getBookInfo(Number(result));
           }
           if (err) {
-            // console.error(err);
+            console.error(err);
           }
         }
       );
     });
   }
 
-  getBookInfo(isbn: number) {
+  async getBookInfo(isbn: number) {
     if (this.isLoading) {
       return;
     }
@@ -109,14 +119,12 @@ export default class DetailPage extends Vue {
       .get(`https://api.openbd.jp/v1/get?isbn=${isbn}`)
       .then(res => {
         if (res.data[0]) {
-          console.log(res.data, res.data.length);
-          console.log(res.data[0]);
           const bookInfo = res.data[0];
           this.currentData.name = bookInfo.summary.title;
           this.currentData.isbn = bookInfo.summary.isbn;
           this.currentData.description =
             bookInfo.onix.CollateralDetail.TextContent[0].Text;
-          this.onStopScan();
+          this.currentData.image = `https://iss.ndl.go.jp/thumbnail/${isbn}`;
         }
       })
       .catch(err => {
@@ -124,6 +132,7 @@ export default class DetailPage extends Vue {
       })
       .finally(() => {
         this.isLoading = false;
+        this.saveBookDta();
       });
   }
 }
@@ -140,9 +149,28 @@ export default class DetailPage extends Vue {
   padding: 1rem;
 }
 
-h2 {
+h2,
+textarea {
   font-size: 1.5rem;
   margin: 0 0 1rem;
+  color: #2c3e50;
+  font-weight: bold;
+  box-sizing: border-box;
+}
+
+textarea.title {
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+}
+
+textarea.isbn {
+  width: auto;
+  font-size: 1rem;
+  width: 100%;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  font-size: 0.8rem;
 }
 
 .col2 {

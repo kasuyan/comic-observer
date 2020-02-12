@@ -1,8 +1,6 @@
 <template>
   <li @click="onClick">
     <BookImage :src="data.image" :width="80" :height="108" :alt="data.name" />
-    <!-- <img v-if="data.image" :src="data.image" alt />
-    <div v-else class="no-image">NO IMAGE</div>-->
     <h2>{{ data.name }}</h2>
   </li>
 </template>
