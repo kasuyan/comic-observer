@@ -2,7 +2,12 @@
   <div class="detail-page" :class="{ 'is-show': isShow }">
     <textarea class="title" v-model="currentData.name" />
     <div class="col2">
-      <BookImage :src="currentData.image" :width="140" :height="190" :alt="currentData.name" />
+      <BookImage
+        :src="currentData.image"
+        :width="140"
+        :height="190"
+        :alt="currentData.name"
+      />
       <dl class="info">
         <dt>あらすじ</dt>
         <dd>{{ currentData.description }}</dd>
@@ -49,7 +54,7 @@ export default class DetailPage extends Vue {
   @Prop() private isShow!: boolean;
   @Prop() onDeleteBook!: (idx: number) => void;
   @Prop() onClickEditHide!: () => void;
-  @Prop() saveBookDta!: () => void;
+  @Prop() saveBookData!: () => void;
 
   title: string = "hoge";
   isbn: number = 0;
@@ -64,7 +69,7 @@ export default class DetailPage extends Vue {
   }
 
   onBookSave() {
-    this.saveBookDta();
+    this.saveBookData();
   }
 
   async onSync() {
@@ -76,7 +81,7 @@ export default class DetailPage extends Vue {
     if (this.READER) {
       this.READER.reset();
     }
-    this.saveBookDta();
+    this.saveBookData();
     this.isScaning = false;
   }
 
@@ -103,7 +108,7 @@ export default class DetailPage extends Vue {
             this.getBookInfo(Number(result));
           }
           if (err) {
-            console.error(err);
+            //console.error(err);
           }
         }
       );
@@ -132,7 +137,7 @@ export default class DetailPage extends Vue {
       })
       .finally(() => {
         this.isLoading = false;
-        this.saveBookDta();
+        this.onStopScan();
       });
   }
 }

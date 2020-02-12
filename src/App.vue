@@ -10,7 +10,7 @@
       :currentData="currentData"
       :onDeleteBook="onDeleteBook"
       :onClickEditHide="onClickEditHide"
-      :saveBookDta="saveBookDta"
+      :saveBookData="saveBookData"
     />
     <Menu
       :onAddDataAndOpen="onAddDataAndOpen"
@@ -67,7 +67,7 @@ export default class App extends Vue {
     });
   }
 
-  saveBookDta() {
+  saveBookData() {
     localforage.setItem("CDDB", this.bookData);
   }
 
@@ -95,7 +95,7 @@ export default class App extends Vue {
       updata: false,
       image: ""
     });
-    this.saveBookDta();
+    this.saveBookData();
   }
 
   onAddDataAndOpen() {
@@ -113,7 +113,7 @@ export default class App extends Vue {
     });
 
     this.bookData.splice(id, 1);
-    this.saveBookDta();
+    this.saveBookData();
   }
 }
 </script>

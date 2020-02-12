@@ -3,7 +3,7 @@
   "short_name": "COMIC OBSERVER",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
+      "src": "/comic-observer/android-chrome-192x192.png",
       "sizes": "192x192",
       "type": "image/png"
     }
