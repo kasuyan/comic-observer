@@ -31,7 +31,7 @@ export interface BookData {
   }
 })
 export default class BookList extends Vue {
-  @Prop({ default: "aho" }) private bookData!: BookData[];
+  @Prop() private bookData!: BookData[];
   @Prop() private msg!: string;
   @Prop() onSelectData!: (index: number) => void;
 }

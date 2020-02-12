@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BookListItem.vue BookListItem does not have imageUrl 1`] = `
+"<li>
+  <bookimage-stub width=\\"80\\" height=\\"108\\" alt=\\"name\\"></bookimage-stub>
+  <h2>name</h2>
+</li>"
+`;
+
+exports[`BookListItem.vue BookListItem has imageUrl 1`] = `
+"<li>
+  <bookimage-stub width=\\"80\\" height=\\"108\\" alt=\\"name\\"></bookimage-stub>
+  <h2>name</h2>
+</li>"
+`;
